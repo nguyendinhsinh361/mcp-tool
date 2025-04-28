@@ -1,0 +1,14 @@
+services:
+  api:
+    build: .
+    container_name: mcp-tool
+    ports:
+      - "8000-8020:8000-8020"
+    environment:
+      - NODE_OPTIONS=--no-warnings
+    env_file:
+      - .env
+    restart: unless-stopped
+networks:
+  app-network:
+    driver: bridge
