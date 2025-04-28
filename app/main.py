@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.core.logging import LogManager
 from app.servers.mcp.sse.social import SocialServer
 from app.servers.mcp.std.base import StdServer
+from app.utils.cmd.npx import NPXCommandRequest
 
 # Add the project root to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -42,11 +43,15 @@ def run_github_server():
     try:
         log.info("Starting Github Server...")
         github_server = StdServer()
+        
+        # Créer une requête conforme au modèle NPXCommandRequest
+        args = f"--stdio \"npx -y @modelcontextprotocol/server-github GITHUB_PERSONAL_ACCESS_TOKEN={settings.GITHUB_PERSONAL_ACCESS_TOKEN}\" --port {settings.GITHUB_PORT} --baseUrl {settings.IP_HOST}:{settings.GITHUB_PORT} --ssePath /sse"
+        
         asyncio.run(github_server.run_npx_command(
-            {
-                "command": "just-aii-guess",
-                "args": f"--stdio \"npx -y @modelcontextprotocol/server-github GITHUB_PERSONAL_ACCESS_TOKEN={settings.GITHUB_PERSONAL_ACCESS_TOKEN}\" --port {settings.GITHUB_PORT} --baseUrl {settings.IP_HOST}:{settings.GITHUB_PORT} --ssePath /sse"
-            }
+            NPXCommandRequest(
+                command="just-aii-guess",
+                args=args
+            )
         ))
         
     except Exception as e:

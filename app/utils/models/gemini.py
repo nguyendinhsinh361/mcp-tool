@@ -1,5 +1,5 @@
 from typing import Dict
-from .utils.models.base import BaseAIModel
+from app.utils.models.base import BaseAIModel  # Correction du chemin d'import
 
 class GeminiModel(BaseAIModel):
     """Enum containing all Google Gemini models"""

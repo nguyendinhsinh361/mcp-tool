@@ -22,9 +22,13 @@ class BaseMCPServer:
             host: The host to bind to (optional)
         """
         self.name = name
+        self.host = host or settings.IP_HOST
+        self.port = port
+        
         self.mcp = FastMCP(name)
-        self.mcp.settings.host = settings.IP_HOST
-        self.mcp.settings.port = int(port)
+        self.mcp.settings.host = self.host
+        if self.port:
+            self.mcp.settings.port = int(self.port)
         
         self.logger = logger.getChild(f"server.{name.lower()}")
     
@@ -36,7 +40,8 @@ class BaseMCPServer:
             transport: The transport type to use ("sse" or "stdio")
         """
         try:
-            self.logger.info(f"Starting {self.name} MCP Server on port {self.port}...")
+            # Utiliser self.mcp.settings.port au lieu de self.port pour le logging
+            self.logger.info(f"Starting {self.name} MCP Server on port {self.mcp.settings.port}...")
             self.mcp.run(transport=transport)
         except Exception as e:
             self.logger.error(f"Failed to start {self.name} server: {e}")

@@ -1,5 +1,5 @@
 from typing import Dict
-from .utils.models.base import BaseAIModel
+from app.utils.models.base import BaseAIModel  # Correction du chemin d'import
 
 class ChatGPTModel(BaseAIModel):
     """Enum containing all ChatGPT (OpenAI) models"""
@@ -34,4 +34,3 @@ class ChatGPTModel(BaseAIModel):
         }
         
         return context_windows.get(self, 0)
-

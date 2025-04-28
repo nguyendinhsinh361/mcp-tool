@@ -13,8 +13,9 @@ class SocialServer(BaseMCPServer):
     
     def __init__(self):
         """Initialize the social server with default port"""
-        port = settings.SOCIAL_PORT
-        super().__init__("Social", port=port)
+        # Utilisez super().__init__ pour appeler le constructeur de la classe parente
+        # et passez le port en tant que paramètre
+        super().__init__("Social", port=settings.SOCIAL_PORT)
         self._register_tools()
     
     def _register_tools(self) -> None:
@@ -66,7 +67,7 @@ class SocialServer(BaseMCPServer):
                 
             except Exception as e:
                 self.logger.error(f"Error fetching weather data: {str(e)}")
-                raise ToolError(f"날씨 정보를 가져오는 중 오류가 발생했습니다: {str(e)}")
+                raise ToolError("weather", f"날씨 정보를 가져오는 중 오류가 발생했습니다: {str(e)}")
         
         @self.mcp.tool()
         def get_kpop_idol_info(idol_name: str) -> str:
@@ -146,12 +147,12 @@ class SocialServer(BaseMCPServer):
                     
                     if similar_idols:
                         suggestion_msg = f"'{idol_name}'을(를) 찾을 수 없습니다. 혹시 다음 중 하나를 찾으시나요? {', '.join(similar_idols)}"
-                        raise ToolError(suggestion_msg)
+                        raise ToolError("idol_info", suggestion_msg)
                     else:
-                        raise ToolError(f"'{idol_name}'에 대한 정보를 찾을 수 없습니다.")
+                        raise ToolError("idol_info", f"'{idol_name}'에 대한 정보를 찾을 수 없습니다.")
                 
             except Exception as e:
                 if isinstance(e, ToolError):
                     raise e
                 self.logger.error(f"Error fetching idol information: {str(e)}")
-                raise ToolError(f"아이돌 정보를 가져오는 중 오류가 발생했습니다: {str(e)}")
+                raise ToolError("idol_info", f"아이돌 정보를 가져오는 중 오류가 발생했습니다: {str(e)}")

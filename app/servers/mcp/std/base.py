@@ -1,16 +1,8 @@
 import uuid
 from datetime import datetime
-from core.logging import LogManager
-from utils.cmd.npx import NPXCommandRequest, NPXRunner, ProcessInfo
-from fastapi import BackgroundTasks, HTTPException, status
-
-# github_server = StdServer()
-# await github_server.run_npx_command(
-#     {
-#         "command": "just-aii-guess",
-#         "args": "--stdio \"npx -y @modelcontextprotocol/server-github GITHUB_PERSONAL_ACCESS_TOKEN=abcd\" --port 10002 --baseUrl http://192.168.10.34:10002 --ssePath /sse"
-#     }
-# )
+from app.core.logging import LogManager  # Correction de l'import
+from app.utils.cmd.npx import NPXCommandRequest, NPXRunner, ProcessInfo  # Import complet
+from fastapi import HTTPException, status
 
 class StdServer:
     def __init__(self):
@@ -74,7 +66,7 @@ class StdServer:
         return ProcessInfo(
             process_id=process_id,
             command="", # Would need to be stored separately
-            args=[],    # Would need to be stored separately
+            args="",    # Would need to be stored separately
             status=process_status,
             start_time="", # Would need to be stored separately
             pid=process.pid
