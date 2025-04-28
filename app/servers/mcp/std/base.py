@@ -9,24 +9,25 @@ class StdServer:
         self.processes = {}
         log_manager = LogManager()
         self.logger = log_manager.get_logger("STD TOOLS")
+        self.npx_runner = NPXRunner()
     
-    async def run_npx_command(
-        self,
-        request: NPXCommandRequest,
-    ):
+    async def run_npx_command(self, request: NPXCommandRequest):
         """Run an NPX command and return the process ID"""
         # Generate a unique ID for this process
         process_id = str(uuid.uuid4())
-        npx_command = NPXRunner()
+        
         try:
             # Run the command
-            process = await npx_command.run_command(
+            process = await self.npx_runner.run_command(
                 request.command,
                 request.args,
                 request.env_vars,
                 request.working_dir,
                 process_id
             )
+            
+            # Store the process in our processes dictionary
+            self.processes[process_id] = process
             
             # Return process info
             return ProcessInfo(

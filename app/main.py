@@ -8,12 +8,10 @@ import time
 import signal
 import multiprocessing
 import subprocess
-import asyncio
 from app.core.config import settings
 from app.core.logging import LogManager
-from app.servers.mcp.sse.social import SocialServer
-from app.servers.mcp.std.base import StdServer
-from app.utils.cmd.npx import NPXCommandRequest
+from app.servers.mcp.tools.github import run_github_server_wrapper
+from app.servers.mcp.tools.social import run_social_server
 
 # Add the project root to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -29,34 +27,6 @@ running = True
 # Global storage for processes that aren't managed by multiprocessing
 subprocess_processes = []
 
-def run_social_server():
-    """Run the Social MCP Server"""
-    try:
-        log.info("Starting Social Server...")
-        server = SocialServer()
-        server.run()
-    except Exception as e:
-        log.error(f"Error in Social Server: {e}")
-
-def run_github_server():
-    """Run the Github MCP Server using just-aii-guess package"""
-    try:
-        log.info("Starting Github Server...")
-        github_server = StdServer()
-        
-        # Créer une requête conforme au modèle NPXCommandRequest
-        args = f"--stdio \"npx -y @modelcontextprotocol/server-github GITHUB_PERSONAL_ACCESS_TOKEN={settings.GITHUB_PERSONAL_ACCESS_TOKEN}\" --port {settings.GITHUB_PORT} --baseUrl {settings.IP_HOST}:{settings.GITHUB_PORT} --ssePath /sse"
-        
-        asyncio.run(github_server.run_npx_command(
-            NPXCommandRequest(
-                command="just-aii-guess",
-                args=args
-            )
-        ))
-        
-    except Exception as e:
-        log.error(f"Error in Github Server: {e}")
-
 def sigint_handler(signum, frame):
     """Handle CTRL+C signal to gracefully shut down"""
     global running
@@ -64,6 +34,14 @@ def sigint_handler(signum, frame):
     running = False
 
 def display_startup_message(processes, github_process=None):
+     # Check if processes are alive
+    alive_processes = [p for p in processes if p.is_alive()]
+    if len(alive_processes) < len(processes):
+        log.error("Some servers failed to start. Check logs for details.")
+        for p in processes:
+            if not p.is_alive():
+                log.error(f"{p.name} failed to start.")
+                
     """Display a startup message with server information"""
     print("\n" + "=" * 60)
     print("MCP SERVERS RUNNING".center(60))
@@ -107,24 +85,15 @@ def run_all_servers():
     processes.append(weather_process)
     
     # Start Github Server (using subprocess instead of multiprocessing)
-    github_process = multiprocessing.Process(target=run_github_server, name="Github Server")
+    github_process = multiprocessing.Process(target=run_github_server_wrapper, name="Github Server")
     github_process.daemon = True
     github_process.start()
     processes.append(github_process)
     
     # Wait a moment for servers to start
     time.sleep(2)
-    
-    # Check if processes are alive
-    alive_processes = [p for p in processes if p.is_alive()]
-    if len(alive_processes) < len(processes):
-        log.error("Some servers failed to start. Check logs for details.")
-        for p in processes:
-            if not p.is_alive():
-                log.error(f"{p.name} failed to start.")
-    
     # Display startup message
-    display_startup_message(alive_processes)
+    display_startup_message(processes)
     
     # Keep the main process running until interrupted
     try:

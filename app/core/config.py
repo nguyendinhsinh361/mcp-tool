@@ -23,7 +23,7 @@ class Settings:
         self.USE_GEMINI: bool = False
         
         # Server settings
-        self.IP_HOST: str = os.environ.get("IP_HOST", "192.168.10.229")
+        self.IP_HOST: str = os.environ.get("IP_HOST", "0.0.0.0")
         self.SOCIAL_PORT: int = os.environ.get("SOCIAL_PORT", 8000)
         self.GITHUB_PORT: int = os.environ.get("WEATHER_PORT", 8002)
         
@@ -42,12 +42,12 @@ class Settings:
         """Get server configuration for multi-client"""
         if self._server_config is None:
             self._server_config = {
-                "math": {
-                    "url": f"http://{self.IP_HOST}:{self.MATH_PORT}/sse",
+                "social": {
+                    "url": f"http://{self.IP_HOST}:{self.SOCIAL_PORT}/sse",
                     "transport": "sse",
                 },
-                "weather": {
-                    "url": f"http://{self.IP_HOST}:{self.WEATHER_PORT}/sse",
+                "github": {
+                    "url": f"http://{self.IP_HOST}:{self.GITHUB_PORT}/sse",
                     "transport": "sse",
                 }
             }

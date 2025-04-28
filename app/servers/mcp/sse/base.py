@@ -40,7 +40,6 @@ class BaseMCPServer:
             transport: The transport type to use ("sse" or "stdio")
         """
         try:
-            # Utiliser self.mcp.settings.port au lieu de self.port pour le logging
             self.logger.info(f"Starting {self.name} MCP Server on port {self.mcp.settings.port}...")
             self.mcp.run(transport=transport)
         except Exception as e:

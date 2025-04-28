@@ -3,7 +3,8 @@ services:
     build: .
     container_name: mcp-tool
     ports:
-      - "8000-8020:8000-8020"
+      - "8000:8000"  # Social MCP
+      - "8002:8002"  # Github MCP
     environment:
       - NODE_OPTIONS=--no-warnings
     env_file:
